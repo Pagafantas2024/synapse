@@ -3,7 +3,7 @@
 
 
 import * as core from '@actions/core';
-import { getBearer, getManagedIdentityBearer } from './service_principal_client_utils';
+import { getBearer, getManagedIdentityBearer, getUserManagedIdentityBearer } from './service_principal_client_utils';
 
 export enum DeployStatus {
     success = 'Success',
@@ -46,6 +46,7 @@ export async function getParams(dataplane: boolean = false, env: string = ""): P
         var managedIdentity = core.getInput("managedIdentity");
         var activeDirectoryEndpointUrl = getAdEndpointUrl(env);
         var resourceManagerEndpointUrl = getRmEndpointUrl(env);
+        var uami = core.getInput("uami");
 
     } catch (err) {
         throw new Error("Unable to parse the secret: " + err);
@@ -60,6 +61,11 @@ export async function getParams(dataplane: boolean = false, env: string = ""): P
 
         if(managedIdentity == 'true'){
             bearer = await getManagedIdentityBearer(resourceManagerEndpointUrl);
+        }else{
+            bearer = await getBearer(clientId, clientSecret, subscriptionId, tenantId, resourceManagerEndpointUrl, activeDirectoryEndpointUrl);
+        }
+        if(uami == 'true'){
+            bearer = await getUserManagedIdentityBearer(resourceManagerEndpointUrl,clientId);
         }else{
             bearer = await getBearer(clientId, clientSecret, subscriptionId, tenantId, resourceManagerEndpointUrl, activeDirectoryEndpointUrl);
         }
