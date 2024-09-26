@@ -20,9 +20,11 @@ jobs:
         node-version: '16'
 
     - name: Install dependencies
+      working-directory: ./build_and_deploy
       run: npm install
 
     - name: Compile TypeScript
+      working-directory: ./build_and_deploy
       run: npm run build
 
     - name: Create a release
